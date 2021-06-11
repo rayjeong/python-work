@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+import sys
+import re
+import operator
+import csv
+
+error = {}
+per_user = {}
+
+error_header = ['ERROR', 'COUNT']
+per_user_header = ['Username', 'INFO', 'ERROR']
+
+with open ( "./log", "r" ) as f:
+	f = f.readlines()
+
+	for line in f:
+		#print (line)
+		if re.search(r"ERROR: ([\w ]*) .*\((\w+)\)", line) is not None:
+			err = re.search(r"ERROR: ([\w ]*) .*\((\w+)\)", line) 
+			error[err.group(1)] = error.get(err.group(1), 0) + 1
+			if err.group(2) not in per_user:
+				per_user[err.group(2)] = { 'INFO': 0, 'ERROR': 0 }
+			per_user[err.group(2)]['ERROR'] = per_user.get(err.group(2), {}).get('ERROR', 0) + 1
+
+		if re.search(r"INFO: ([\w ]*) .*\((\w+)\)", line) is not None:
+			info = re.search(r"INFO: ([\w ]*) .*\((\w+)\)", line)
+			if info.group(2) not in per_user:
+				per_user[info.group(2)] = { 'INFO': 0, 'ERROR': 0 }
+			per_user[info.group(2)]['INFO'] = per_user.get(info.group(2), {}).get('INFO', 0) + 1
+		#print (per_user)
+	
+
+#print (error)
+#print (per_user)
+
+with open('error_message.csv', 'w') as csv_file:  
+	writer = csv.writer(csv_file)
+	writer.writerow(error_header)
+	for key, value  in sorted(error.items(), key=lambda item: item[1], reverse=True):
+		writer.writerow([key, value])
+
+with open('user_statistics.csv', 'w') as csv_file:  
+	writer = csv.writer(csv_file)
+	writer.writerow(per_user_header)
+	for key, value  in sorted(per_user.items() ):
+		entry = [ key, per_user[key]['INFO'], per_user[key]['ERROR']]
+		writer.writerow( entry )
+		#print ( key, per_user[key]['INFO'], per_user[key]['ERROR'] )
+
+#print ( dic3.get('jane', {}).get('info', {}))

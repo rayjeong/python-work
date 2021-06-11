@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+
+import sys
+import re
+import operator
+
+errors = {}
+per_users = {}
+
+with open ( "syslog.log", "r" ) as f:
+        for line in f.read():
+                if re.search(r"INFO: ([\w ]*) ", line):
+                        per_users[i] = counts.get(i, 0) + 1
+                if re.search(r"ERROR: ([\w ]*) ", line):
+                        errors[err] = errors.get(line, 0) + 1
+print(line)
+
